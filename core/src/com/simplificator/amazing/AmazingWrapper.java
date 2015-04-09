@@ -10,7 +10,6 @@ import com.laamella.amazingmazes.mazemodel.grid.implementation.GridRowGenerator;
 import com.laamella.amazingmazes.mazemodel.grid.implementation.GridStateStorage;
 import com.laamella.amazingmazes.mazemodel.grid.implementation.GridWithDecoupledState;
 import com.laamella.amazingmazes.mazemodel.matrix.Matrix;
-import com.laamella.amazingmazes.mazemodel.matrix.implementation.ListMatrix;
 import com.laamella.amazingmazes.mazemodel.matrix.implementation.StateMatrix;
 
 /**
@@ -23,7 +22,13 @@ public class AmazingWrapper {
 
     public static void main(String[] args) {
 
-        Matrix matrix = new StateMatrix(new Size(21, 21));
+        generate();
+
+
+    }
+
+    public static Grid generate() {
+        Matrix matrix = new StateMatrix(new Size(7, 7));
 
         GridStateStorage matrixStorage = new GridMatrixStorage(matrix);
 
@@ -32,21 +37,26 @@ public class AmazingWrapper {
 
         GridRowGenerator gridRowGenerator = new GridRowGenerator(grid);
 
-        SideWinderMazeGenerator generator = new SideWinderMazeGenerator(new Randomizer.Default());
+        SideWinderMazeGenerator generator = new SideWinderMazeGenerator(new Randomizer.Default(0));
 
         generator.generateMaze(gridRowGenerator);
 
         //System.out.println(matrixStorage.getSquareState(new Position(0, 0)));
         //System.out.println(matrixStorage.getWallState(new Position(0, 0), false));
 
-        for (int i = 0; i < grid.getSize().width; i++)
-            for (int j = 0; j < grid.getSize().height; j++) {
-                Square square = grid.getSquare(new Position(i, j));
-                Wall wall = square.getWall(Direction.DOWN);
-                System.out.println("" + i + "," + j + ": " + wall.isOpen());
-            }
+//        for (int i = 0; i < grid.getSize().width; i++) {
+//            for (int j = 0; j < grid.getSize().height; j++) {
+//                Square square = grid.getSquare(new Position(i, j));
+//                for (Direction direction : Direction.values()) {
+//                    Wall wall = square.getWall(direction);
+//                    System.out.println("" + i + "," + j + ": " + direction.name()+ ", "+  !wall.isOpen());
+//                }
+//                System.out.println();
+//
+//            }
+//        }
 
-
+        return grid;
     }
 
 

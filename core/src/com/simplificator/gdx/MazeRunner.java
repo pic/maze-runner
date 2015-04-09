@@ -5,12 +5,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
+import com.badlogic.gdx.graphics.g3d.model.MeshPart;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.GdxRuntimeException;
-
-import static com.badlogic.gdx.graphics.VertexAttributes.Usage.Position;
 
 public class MazeRunner extends ApplicationAdapter {
     SpriteBatch batch;
@@ -49,24 +46,23 @@ public class MazeRunner extends ApplicationAdapter {
 
 
     public static final String VERT_SHADER =
-            "attribute vec3 a_position;\n" +
-                    "attribute vec4 a_color;\n" +
-                    "uniform mat4 u_projTrans;\n" +
-                    "varying vec4 vColor;\n" +
-                    "void main() {\n" +
-                    "	vColor = a_color;\n" +
-                    "	gl_Position =  u_projTrans * vec4(a_position.xyz, 1.0);\n" +
-                    "}";
+        "attribute vec3 a_position;\n" +
+            "attribute vec4 a_color;\n" +
+            "uniform mat4 u_projTrans;\n" +
+            "varying vec4 vColor;\n" +
+            "void main() {\n" +
+            "	vColor = a_color;\n" +
+            "	gl_Position =  u_projTrans * vec4(a_position.xyz, 1.0);\n" +
+            "}";
 
     public static final String FRAG_SHADER =
-            "#ifdef GL_ES\n" +
-                    "precision mediump float;\n" +
-                    "#endif\n" +
-                    "varying vec4 vColor;\n" +
-                    "void main() {\n" +
-                    "	gl_FragColor = vColor;\n" +
-                    "}";
-
+        "#ifdef GL_ES\n" +
+            "precision mediump float;\n" +
+            "#endif\n" +
+            "varying vec4 vColor;\n" +
+            "void main() {\n" +
+            "	gl_FragColor = vColor;\n" +
+            "}";
 
 
     protected static ShaderProgram createMeshShader() {
@@ -84,15 +80,22 @@ public class MazeRunner extends ApplicationAdapter {
     @Override
     public void create() {
 
-        mesh = new Mesh(true, MAX_VERTS, 0,
-                new VertexAttribute(VertexAttributes.Usage.Position, POSITION_COMPONENTS, "a_position"),
-                new VertexAttribute(VertexAttributes.Usage.ColorUnpacked, COLOR_COMPONENTS, "a_color"));
+//        mesh = new Mesh(true, MAX_VERTS, 0,
+//                new VertexAttribute(VertexAttributes.Usage.Position, POSITION_COMPONENTS, "a_position"),
+//                new VertexAttribute(VertexAttributes.Usage.ColorUnpacked, COLOR_COMPONENTS, "a_color"));
+
+        mesh = GridToMesh.generate();
 
         shader = createMeshShader();
         cam = new PerspectiveCamera();
         cam.position.z = 4f;
 
-        cameraHandler = new CameraHandler(cam);
+        cameraHandler = new CameraHandler(new PerspectiveCamera());
+
+
+        cam.position.y=-20f;
+        cam.lookAt(0,0,0);
+        cam.update();
 
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glDepthMask(true);
@@ -114,12 +117,8 @@ public class MazeRunner extends ApplicationAdapter {
 
     @Override
     public void render() {
-        Gdx.gl.glClearColor(0, 1, 0, 1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-
-        //this will push the triangles into the batch
-        drawTriangle(-1, -1, 0, 2, 2, Color.RED);
-        drawTriangle(-2, -2, -2, 2, 2, Color.BLUE);
 
         updateCamera();
 
@@ -138,7 +137,7 @@ public class MazeRunner extends ApplicationAdapter {
         long delta =  now - frameLastTime;
         frameLastTime = now;
 
-        cameraHandler.setDelta(delta);
+        cameraHandler.setFrameDelta(delta);
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             cameraHandler.lookLeft();
@@ -163,19 +162,19 @@ public class MazeRunner extends ApplicationAdapter {
 
 
         //if we've already flushed
-        if (idx == 0)
-            return;
+//        if (idx == 0)
+//            return;
 
         //sends our vertex data to the mesh
-        mesh.setVertices(verts);
-
+      //  mesh.setVertices(verts);
 
         //enable blending, for alpha
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+//        Gdx.gl.glEnable(GL20.GL_BLEND);
+//        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         //number of vertices we need to render
-        int vertexCount = (idx / NUM_COMPONENTS);
+
+        int vertexCount = mesh.getMaxVertices()/7;//(idx / NUM_COMPONENTS);
         //start the shader before setting any uniforms
         shader.begin();
 
@@ -191,50 +190,6 @@ public class MazeRunner extends ApplicationAdapter {
         idx = 0;
     }
 
-    String maze = " *    *     *" +
-            " ******      " +
-            " ******      " +
-            " ******      " +
-            " ******      ";
-
-
-    void drawTriangle(float x, float y, float z, float width, float height, Color color) {
-        //we don't want to hit any index out of bounds exception...
-        //so we need to flush the batch if we can't store any more verts
-        if (idx == verts.length)
-            flush();
-
-        //now we push the vertex data into our array
-        //we are assuming (0, 0) is lower left, and Y is up
-
-        //bottom left vertex
-        verts[idx++] = x;            //Position(x, y)
-        verts[idx++] = y;
-        verts[idx++] = z;
-        verts[idx++] = color.r;    //Color(r, g, b, a)
-        verts[idx++] = color.g;
-        verts[idx++] = color.b;
-        verts[idx++] = color.a;
-
-        //top left vertex
-        verts[idx++] = x;            //Position(x, y)
-        verts[idx++] = y + height;
-        verts[idx++] = z;
-        verts[idx++] = color.r;    //Color(r, g, b, a)
-        verts[idx++] = color.g;
-        verts[idx++] = color.b;
-        verts[idx++] = color.a;
-
-        //bottom right vertex
-        verts[idx++] = x + width;     //Position(x, y)
-        verts[idx++] = y;
-        verts[idx++] = z;
-        verts[idx++] = color.r;         //Color(r, g, b, a)
-        verts[idx++] = color.g;
-        verts[idx++] = color.b;
-        verts[idx++] = color.a;
-
-    }
 
     @Override
     public void dispose() {

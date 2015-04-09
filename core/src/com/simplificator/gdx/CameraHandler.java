@@ -16,13 +16,13 @@ public class CameraHandler {
 
     public CameraHandler(PerspectiveCamera camera) {
         this.mCamera = camera;
+        camera.position.y=1.6f; // height of the eyes
     }
 
-    public void setDelta(long frameMS) {
+    public void setFrameDelta(long frameMS) {
         this.mFrameMs = frameMS;
-        deltaMoveSpeed = moveSpeed / 1000f *mFrameMs;
-        deltaRotationSpeed = (float) (Math.toRadians(rotSpeed) / 1000f *mFrameMs);
-
+        deltaMoveSpeed = moveSpeed / 1000f * mFrameMs;
+        deltaRotationSpeed = (float) (Math.toRadians(rotSpeed) / 1000f * mFrameMs);
     }
 
     public void lookLeft() {
@@ -34,12 +34,13 @@ public class CameraHandler {
     }
 
     public void moveForward() {
-        mCamera.position.x += (float) Math.sin(currentBearing)* deltaMoveSpeed;
-        mCamera.position.z += (float) Math.cos(currentBearing)* deltaMoveSpeed;
+        mCamera.position.x += (float) Math.sin(currentBearing) * deltaMoveSpeed;
+        mCamera.position.z += (float) Math.cos(currentBearing) * deltaMoveSpeed;
     }
+
     public void moveBack() {
-        mCamera.position.x -= (float) Math.sin(currentBearing)* deltaMoveSpeed;
-        mCamera.position.z -= (float) Math.cos(currentBearing)* deltaMoveSpeed;
+        mCamera.position.x -= (float) Math.sin(currentBearing) * deltaMoveSpeed;
+        mCamera.position.z -= (float) Math.cos(currentBearing) * deltaMoveSpeed;
     }
 
     public void update() {
