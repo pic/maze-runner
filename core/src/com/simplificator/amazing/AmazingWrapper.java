@@ -28,7 +28,7 @@ public class AmazingWrapper {
     }
 
     public static Grid generate() {
-        Matrix matrix = new StateMatrix(new Size(7, 7));
+        Matrix matrix = new StateMatrix(new Size(21, 21));
 
         GridStateStorage matrixStorage = new GridMatrixStorage(matrix);
 

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.model.MeshPart;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 public class MazeRunner extends ApplicationAdapter {
@@ -17,7 +18,7 @@ public class MazeRunner extends ApplicationAdapter {
     private PerspectiveCamera cam;
     private CameraHandler cameraHandler;
     private ShaderProgram shader;
-    private long frameLastTime =0;
+    private long frameLastTime = 0;
 
     //Position attribute - (x, y)
     public static final int POSITION_COMPONENTS = 3;
@@ -63,6 +64,7 @@ public class MazeRunner extends ApplicationAdapter {
             "void main() {\n" +
             "	gl_FragColor = vColor;\n" +
             "}";
+    private PerspectiveCamera cheatCam;
 
 
     protected static ShaderProgram createMeshShader() {
@@ -90,12 +92,15 @@ public class MazeRunner extends ApplicationAdapter {
         cam = new PerspectiveCamera();
         cam.position.z = 4f;
 
-        cameraHandler = new CameraHandler(new PerspectiveCamera());
+        cameraHandler = new CameraHandler(cam);
 
 
-        cam.position.y=-20f;
-        cam.lookAt(0,0,0);
-        cam.update();
+        cheatCam = new PerspectiveCamera();
+
+        cheatCam.position.y = -10f;
+        cheatCam.position.z = 4f;
+        cheatCam.lookAt(0, 0, 0);
+        cheatCam.update();
 
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glDepthMask(true);
@@ -111,8 +116,17 @@ public class MazeRunner extends ApplicationAdapter {
         cam.near = 0.1f;
         cam.far = 50f;
 
-
         cam.update();
+
+
+        cheatCam.viewportWidth = width;
+        cheatCam.viewportHeight = height;
+
+        cheatCam.near = 0.1f;
+        cheatCam.far = 50f;
+
+        cheatCam.update();
+
     }
 
     @Override
@@ -129,12 +143,12 @@ public class MazeRunner extends ApplicationAdapter {
 
     private void updateCamera() {
 
-        if(frameLastTime == 0){
+        if (frameLastTime == 0) {
             frameLastTime = System.currentTimeMillis();
         }
 
         long now = System.currentTimeMillis();
-        long delta =  now - frameLastTime;
+        long delta = now - frameLastTime;
         frameLastTime = now;
 
         cameraHandler.setFrameDelta(delta);
@@ -166,7 +180,7 @@ public class MazeRunner extends ApplicationAdapter {
 //            return;
 
         //sends our vertex data to the mesh
-      //  mesh.setVertices(verts);
+        //  mesh.setVertices(verts);
 
         //enable blending, for alpha
 //        Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -174,12 +188,20 @@ public class MazeRunner extends ApplicationAdapter {
 
         //number of vertices we need to render
 
-        int vertexCount = mesh.getMaxVertices()/7;//(idx / NUM_COMPONENTS);
+        int vertexCount = mesh.getMaxVertices() / 7;//(idx / NUM_COMPONENTS);
         //start the shader before setting any uniforms
         shader.begin();
 
         //update the projection matrix so our triangles are rendered in 2D
-        shader.setUniformMatrix("u_projTrans", cam.combined);
+
+        Matrix4 camCombined;
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            camCombined = cheatCam.combined;
+        } else {
+            camCombined = cam.combined;
+        }
+
+        shader.setUniformMatrix("u_projTrans", camCombined);
 
         //render the mesh
         mesh.render(shader, GL20.GL_TRIANGLES, 0, vertexCount);
