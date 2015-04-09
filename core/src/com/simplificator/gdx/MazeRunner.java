@@ -135,6 +135,7 @@ public class MazeRunner extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         updateCamera();
+        updateCheatCamera();
 
         //this will render the triangles to GL
         flush();
@@ -171,6 +172,15 @@ public class MazeRunner extends ApplicationAdapter {
         cameraHandler.update();
 
     }
+
+    private void updateCheatCamera() {
+        cheatCam.position.x = cam.position.x;
+        cheatCam.position.z = cam.position.z;
+
+        cheatCam.lookAt(cam.position.x, 0, cam.position.z);
+        cheatCam.update();
+    }
+
 
     void flush() {
 
