@@ -1,5 +1,6 @@
 package com.simplificator.gdx.android;
 
+/*
 import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
@@ -14,3 +15,4 @@ public class AndroidLauncher extends AndroidApplication {
 		initialize(new MazeRunner(), config);
 	}
 }
+ */
