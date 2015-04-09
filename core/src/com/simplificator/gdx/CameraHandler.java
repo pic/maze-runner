@@ -10,6 +10,7 @@ public class CameraHandler {
     private final PerspectiveCamera mCamera;
     private long mFrameMs;
     private double currentBearing = Math.PI;//(float) (Math.PI/2);
+    private double currentTilt = 0;
 
     private float deltaMoveSpeed = 0;
     private float deltaRotationSpeed = 0;
@@ -33,6 +34,15 @@ public class CameraHandler {
         currentBearing -= deltaRotationSpeed;
     }
 
+    public void lookUp() {
+        currentTilt += deltaRotationSpeed;
+    }
+
+    public void lookDown() {
+        currentTilt -= deltaRotationSpeed;
+    }
+
+
     public void moveForward() {
         mCamera.position.x += (float) Math.sin(currentBearing) * deltaMoveSpeed;
         mCamera.position.z += (float) Math.cos(currentBearing) * deltaMoveSpeed;
@@ -46,6 +56,7 @@ public class CameraHandler {
     public void update() {
         mCamera.direction.x = (float) Math.sin(currentBearing);
         mCamera.direction.z = (float) Math.cos(currentBearing);
+        mCamera.direction.y = (float) Math.sin(currentTilt);
         mCamera.update();
     }
 

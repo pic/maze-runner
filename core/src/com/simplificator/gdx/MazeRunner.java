@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.model.MeshPart;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
@@ -49,10 +50,14 @@ public class MazeRunner extends ApplicationAdapter {
     public static final String VERT_SHADER =
         "attribute vec3 a_position;\n" +
             "attribute vec4 a_color;\n" +
+            "attribute vec3 a_normal;\n" +
             "uniform mat4 u_projTrans;\n" +
+            "uniform mat3 u_normalTrans;\n" +
             "varying vec4 vColor;\n" +
+            "varying vec3 vNormal;\n" +
             "void main() {\n" +
             "	vColor = a_color;\n" +
+            "   vNormal = u_normalTrans * a_normal; \n"+
             "	gl_Position =  u_projTrans * vec4(a_position.xyz, 1.0);\n" +
             "}";
 
@@ -61,8 +66,13 @@ public class MazeRunner extends ApplicationAdapter {
             "precision mediump float;\n" +
             "#endif\n" +
             "varying vec4 vColor;\n" +
+            "varying vec3 vNormal;\n" +
             "void main() {\n" +
-            "	gl_FragColor = vColor;\n" +
+            "   float brightness = max(0.0,dot(vNormal, vec3(0,0,-1)));  \n" +
+            "   float brightness2 = max(0.0,dot(vNormal, vec3(0,0,1)));  \n" +
+            "   brightness = max(brightness, brightness2);  \n" +
+            "	gl_FragColor =  vColor*(brightness*0.5)+vColor*0.5;\n" +
+            //"	gl_FragColor =  vec4(vNormal,1.0)*0.5+0.5;\n" +
             "}";
     private PerspectiveCamera cheatCam;
 
@@ -104,6 +114,9 @@ public class MazeRunner extends ApplicationAdapter {
 
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glDepthMask(true);
+        Gdx.gl.glDisable(GL20.GL_CULL_FACE);
+        Gdx.gl.glCullFace(GL20.GL_CCW);
+
 
     }
 
@@ -161,6 +174,13 @@ public class MazeRunner extends ApplicationAdapter {
             cameraHandler.lookRight();
         }
 
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            cameraHandler.lookUp();
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            cameraHandler.lookDown();
+        }
+
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             cameraHandler.moveForward();
         }
@@ -198,7 +218,7 @@ public class MazeRunner extends ApplicationAdapter {
 
         //number of vertices we need to render
 
-        int vertexCount = mesh.getMaxVertices() / 7;//(idx / NUM_COMPONENTS);
+        int vertexCount = mesh.getMaxVertices() / 10;//(idx / NUM_COMPONENTS);
         //start the shader before setting any uniforms
         shader.begin();
 
@@ -212,6 +232,7 @@ public class MazeRunner extends ApplicationAdapter {
         }
 
         shader.setUniformMatrix("u_projTrans", camCombined);
+        shader.setUniformMatrix("u_normalTrans", new Matrix3().set(cam.view).inv().transpose());
 
         //render the mesh
         mesh.render(shader, GL20.GL_TRIANGLES, 0, vertexCount);
