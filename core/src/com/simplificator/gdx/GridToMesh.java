@@ -33,7 +33,7 @@ public class GridToMesh {
                 for (Direction direction : Direction.values()) {
                     Wall wall = square.getWall(direction);
                     if(!wall.isOpen()){
-                        mazeToMesh.addWall(position,direction, colors[j%2]);
+                        mazeToMesh.addWall(position,direction, new Color((float) Math.random(), (float)Math.random(), 0, 1));
                     }
                     System.out.println("" + i + "," + j + ": " + direction.name()+ ", "+  !wall.isOpen());
                 }
