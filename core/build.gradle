@@ -1,11 +1,10 @@
 apply plugin: "java"
-
 sourceCompatibility = 1.6
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-
-sourceSets.main.java.srcDirs = [ "src/" ]
-
-
+sourceSets.main.java.srcDirs = ["src/", "lib/amazing-core/src/main/java"]
 eclipse.project {
     name = appName + "-core"
+}
+dependencies {
+    compile 'org.slf4j:slf4j-simple:1.7.5'
 }
