@@ -17,7 +17,7 @@ public class CameraHandler {
 
     public CameraHandler(PerspectiveCamera camera) {
         this.mCamera = camera;
-        camera.position.y=1.6f; // height of the eyes
+        camera.position.y = 1.6f; // height of the eyes
     }
 
     public void setFrameDelta(long frameMS) {

@@ -31,7 +31,6 @@ public class MazeToMesh {
             mazeToMesh.addWall(1, (int) (Math.random() * 100) - 50, 0f, (int) (Math.random() * 100) - 50);
         }
 
-
         mazeToMesh.addFloor();
 
         return mazeToMesh.create();
@@ -40,7 +39,6 @@ public class MazeToMesh {
     public void addWall(float size, float x, float y, float z) {
         addWallImpl(2.4f, size, x, y, z, 0);
     }
-
 
     public void addWall(Position position, Direction direction, Color color) {
         float rotRad = (float) Math.toRadians(getDegFromDirection(direction));
@@ -73,7 +71,7 @@ public class MazeToMesh {
                                 new VertexAttribute(VertexAttributes.Usage.Position, POSITION_COMPONENTS, "a_position"),
                                 new VertexAttribute(VertexAttributes.Usage.Normal, POSITION_COMPONENTS, "a_normal"),
                                 new VertexAttribute(VertexAttributes.Usage.ColorUnpacked, COLOR_COMPONENTS, "a_color"));
-        mesh.setVertices(Arrays.copyOfRange(vertices,0,position));
+        mesh.setVertices(Arrays.copyOfRange(vertices, 0, position));
         return mesh;
     }
 
@@ -231,13 +229,16 @@ public class MazeToMesh {
         vertices[position++] = normal.z;
     }
 
-    private void addFloor(){
+    public void addFloor(){
         check();
 
+        float yFloor = 0;
+
         Color color = Color.BLUE;
+
         Vector3 normal = new Vector3(0,-1,0);
         vertices[position++] = -1000;
-        vertices[position++] = 0;
+        vertices[position++] = yFloor;
         vertices[position++] = -1000;
         addNormal(normal);
         vertices[position++] = color.r;    //Color(r, g, b, a)
@@ -246,7 +247,7 @@ public class MazeToMesh {
         vertices[position++] = color.a;
 
         vertices[position++] = 1000;
-        vertices[position++] = 0;
+        vertices[position++] = yFloor;
         vertices[position++] = -1000;
         addNormal(normal);
         vertices[position++] = color.r;    //Color(r, g, b, a)
@@ -255,7 +256,7 @@ public class MazeToMesh {
         vertices[position++] = color.a;
 
         vertices[position++] = 1000;
-        vertices[position++] = 0;
+        vertices[position++] = yFloor;
         vertices[position++] = 1000;
         addNormal(normal);
         vertices[position++] = color.r;    //Color(r, g, b, a)
@@ -264,7 +265,7 @@ public class MazeToMesh {
         vertices[position++] = color.a;
 
         vertices[position++] = -1000;
-        vertices[position++] = 0;
+        vertices[position++] = yFloor;
         vertices[position++] = -1000;
         addNormal(normal);
         vertices[position++] = color.r;    //Color(r, g, b, a)
@@ -273,7 +274,7 @@ public class MazeToMesh {
         vertices[position++] = color.a;
 
         vertices[position++] = 1000;
-        vertices[position++] = 0;
+        vertices[position++] = yFloor;
         vertices[position++] = 1000;
         addNormal(normal);
         vertices[position++] = color.r;    //Color(r, g, b, a)
@@ -282,7 +283,7 @@ public class MazeToMesh {
         vertices[position++] = color.a;
 
         vertices[position++] = -1000;
-        vertices[position++] = 0;
+        vertices[position++] = yFloor;
         vertices[position++] = 1000;
         addNormal(normal);
         vertices[position++] = color.r;    //Color(r, g, b, a)

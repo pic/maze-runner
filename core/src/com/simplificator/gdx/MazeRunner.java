@@ -107,7 +107,7 @@ public class MazeRunner extends ApplicationAdapter {
 
         cheatCam = new PerspectiveCamera();
 
-        cheatCam.position.y = -10f;
+        cheatCam.position.y = 10f;
         cheatCam.position.z = 4f;
         cheatCam.lookAt(0, 0, 0);
         cheatCam.update();
