@@ -1,9 +1,6 @@
 package com.simplificator.gdx;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Mesh;
-import com.badlogic.gdx.graphics.VertexAttribute;
-import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -19,22 +16,8 @@ import java.util.List;
 public class MazeToMesh {
 
 
-    private static final int POSITION_COMPONENTS = 3;
-    private static final int COLOR_COMPONENTS = 4;
     float[] vertices = new float[1024];
     int position = 0;
-
-
-    public static Mesh getRandom() {
-        MazeToMesh mazeToMesh = new MazeToMesh();
-        for (int i = 0; i < 100; i++) {
-            mazeToMesh.addWall(1, (int) (Math.random() * 100) - 50, 0f, (int) (Math.random() * 100) - 50);
-        }
-
-        mazeToMesh.addFloor();
-
-        return mazeToMesh.create();
-    }
 
     public void addWall(float size, float x, float y, float z) {
         addWallImpl(2.4f, size, x, y, z, 0);
@@ -66,13 +49,14 @@ public class MazeToMesh {
         }
     }
 
-    public Mesh create() {
-        Mesh mesh = new Mesh(true, position, 0,
-                                new VertexAttribute(VertexAttributes.Usage.Position, POSITION_COMPONENTS, "a_position"),
-                                new VertexAttribute(VertexAttributes.Usage.Normal, POSITION_COMPONENTS, "a_normal"),
-                                new VertexAttribute(VertexAttributes.Usage.ColorUnpacked, COLOR_COMPONENTS, "a_color"));
+    public MeshAndIndex create() {
+        // TODO (refactor this!) -> "+ 60" is for the runner vertices
+        Mesh mesh = new Mesh(true, position + 60, 0,
+                                new VertexAttribute(VertexAttributes.Usage.Position, MazeRunner.POSITION_COMPONENTS, "a_position"),
+                                new VertexAttribute(VertexAttributes.Usage.Normal, MazeRunner.NORMAL_COMPONENTS, "a_normal"),
+                                new VertexAttribute(VertexAttributes.Usage.ColorUnpacked, MazeRunner.COLOR_COMPONENTS, "a_color"));
         mesh.setVertices(Arrays.copyOfRange(vertices, 0, position));
-        return mesh;
+        return new MeshAndIndex(mesh, position);
     }
 
     private void addWallImpl(float height, float width, float x, float y, float rotation, Color color) {
@@ -158,6 +142,7 @@ public class MazeToMesh {
         vertices[position++] = color.g;
         vertices[position++] = color.b;
         vertices[position++] = color.a;
+
 // backside
 //
 //        vec2 = new Vector2( - halfWidth, dist);
@@ -237,6 +222,7 @@ public class MazeToMesh {
         Color color = Color.BLUE;
 
         Vector3 normal = new Vector3(0,-1,0);
+
         vertices[position++] = -1000;
         vertices[position++] = yFloor;
         vertices[position++] = -1000;

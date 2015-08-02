@@ -18,13 +18,11 @@ public class GridToMesh {
     int colorpointer = 0;
 
 
-    public static Mesh generate() {
+    public static MeshAndIndex generate() {
 
 
         Grid grid = AmazingWrapper.generate();
         MazeToMesh mazeToMesh = new MazeToMesh();
-
-        mazeToMesh.addFloor();
 
         for (int i = 0; i < grid.getSize().width; i++) {
             for (int j = 0; j < grid.getSize().height; j++) {
@@ -41,6 +39,7 @@ public class GridToMesh {
             }
         }
 
+        //mazeToMesh.addFloor();
         return mazeToMesh.create();
     }
 }
