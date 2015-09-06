@@ -39,7 +39,7 @@ public class GridToMesh {
             }
         }
 
-        //mazeToMesh.addFloor();
+        mazeToMesh.addFloor();
         return mazeToMesh.create();
     }
 }
